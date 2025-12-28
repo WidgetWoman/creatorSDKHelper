@@ -62,7 +62,8 @@ export default class AppRec {
       throw new Error(`${action} returned an invalid response`);
     }
 
-    if (response.code && response.code === 3100) {
+    if (response.code && response.code !== 3000) {
+      alert("Having a problem?" + JSON.stringify(response));
       return [];
     }
 
@@ -137,15 +138,20 @@ export default class AppRec {
       },
     };
 
-    const response = await ZOHO.CREATOR.DATA.addRecords(config);
-    const records = this._validateResponse(response, "Create");
+    try {
+      const response = await ZOHO.CREATOR.DATA.addRecords(config);
+      const records = this._validateResponse(response, "Create");
 
-    const newRecord = data;
-    newRecord.id = records;
+      const newRecord = data;
+      newRecord.id = records;
 
-    this.records.push(this._normalize(newRecord));
+      this.records.push(this._normalize(newRecord));
 
-    return newRecord;
+      return newRecord;
+    } catch (error) {
+      alert(`Error create ${this.form}:` + JSON.stringify(error.responseText));
+      throw error;
+    }
   }
 
   /* --------------------------------------------------
