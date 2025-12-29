@@ -63,7 +63,7 @@ export default class AppRec {
     }
 
     if (response.code && response.code !== 3000) {
-      alert("Having a problem?" + JSON.stringify(response));
+      console.error("Having a problem?" + JSON.stringify(response));
       return [];
     }
 
@@ -207,7 +207,7 @@ export default class AppRec {
         hasMore = !!cursor;
       } catch (error) {
         console.error("Error in read:", error);
-        throw error;
+        return [];
       }
     }
 
@@ -344,6 +344,24 @@ export default class AppRec {
   viewByField(fieldName, value) {
     return this.records.filter((rec) => rec[fieldName] === value);
   }
+
+
+
+
+  sortBySubField(fieldName, subFieldName, ascending = true) {
+    this.records.sort((a, b) => {
+      const fieldA = a[fieldName] && a[fieldName][subFieldName] ? a[fieldName][subFieldName].toUpperCase() : "";
+      const fieldB = b[fieldName] && b[fieldName][subFieldName] ? b[fieldName][subFieldName].toUpperCase() : "";
+
+      if (fieldA < fieldB) {
+        return ascending ? -1 : 1;
+      }
+      if (fieldA > fieldB) {
+        return ascending ? 1 : -1;
+      }
+      return 0;
+    });
+  }
 }
 
 /**
@@ -361,6 +379,8 @@ export default class AppRec {
 export async function initZoho(widgetkey) {
   const rep = await ZOHO.CREATOR.UTIL.getInitParams();
   const rep2 = await ZOHO.CREATOR.UTIL.getQueryParams();
+
+  console.log("Starting Here for trialrun");
 
   const userSettings = rep2[widgetkey] ? JSON.parse(rep2[widgetkey]) : "";
 
